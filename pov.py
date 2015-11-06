@@ -2,6 +2,7 @@
 import tempfile
 import sys
 from os import getcwd, path
+from os.path import basename
 from numpy import loadtxt
 from subprocess import check_call
 
@@ -47,7 +48,7 @@ if __name__ == '__main__':
                 coloring_1(assoc, tfile, row)
             tfile.write(povstrings[1])
             tfile.file.flush()
-            resultfn = '.'.join(infn.split('.')[:-1])
+            resultfn = '.'.join(basename(infn).split('.')[:-1])
             check_call(('povray +W640 +H480 +I%s +O%s.png' % (tfile.name, resultfn)).split(' '))
             print('%s => %s.png' % (infn, resultfn))
 
