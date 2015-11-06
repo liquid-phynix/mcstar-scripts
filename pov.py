@@ -41,7 +41,6 @@ if __name__ == '__main__':
             data, assoc = None, None
             with open(infn, 'r') as inf:
                 assoc = name2col(inf)
-                print(assoc)
                 data=loadtxt(inf)
 
             tfile.file.truncate(0)
