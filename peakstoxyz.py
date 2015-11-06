@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 import sys, StringIO
 import numpy as np
+from os.path import basename
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
@@ -15,7 +16,7 @@ if __name__ == '__main__':
         s.write('%d\ncomment\n' % len(d))
         for row in d:
             s.write('A\t%f\t%f\t%f\n' % tuple(row))
-        with open(fn + '.xyz', 'w') as outf:
+        with open(os.basename(fn).split('.')[0] + '.xyz', 'w') as outf:
             outf.write(s.getvalue())
 
 #if __name__ == '__main__':
