@@ -47,8 +47,9 @@ if __name__ == '__main__':
                 coloring_1(assoc, tfile, row)
             tfile.write(povstrings[1])
             tfile.file.flush()
-            check_call(('povray +W640 +H480 +I%s +O%s.png' % (tfile.name, ('.'.join(infn.split('.')[:-1])))).split(' '))
-            print(infn + ' processed')
+            resultfn = '.'.join(infn.split('.')[:-1])
+            check_call(('povray +W640 +H480 +I%s +O%s.png' % (tfile.name, resultfn)).split(' '))
+            print('%s => %s.png' % (infn, resultfn))
 
 # Kawasaki & Tanaka
                 # q6b = row[10]
