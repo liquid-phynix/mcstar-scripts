@@ -19,6 +19,7 @@ def sphere(*args):
     return 'sphere{ <%e, %e, %e>, 4  pigment { rgb <%e, %e, %e> } finish { phong 0.7 phong_size 20 } }' % args
 
 # vars = ...
+# Kawasaki & Tanaka
 def coloring_1(d, f, vars):
     x,y,z = vars[d['x']], vars[d['y']], vars[d['z']]
     q6b = vars[d['q6b']]
@@ -28,7 +29,7 @@ def coloring_1(d, f, vars):
         f.write(sphere(x, y, z, 0, 1, 0).encode())
 
 def name2col(f):
-    comment = f.readline()
+    comment = f.readline().strip()
     return dict([(name,col) for col, name in enumerate(comment.split(' ')[1:])])
 
 if __name__ == '__main__':
@@ -40,6 +41,7 @@ if __name__ == '__main__':
             data, assoc = None, None
             with open(infn, 'r') as inf:
                 assoc = name2col(inf)
+                print(assoc)
                 data=loadtxt(inf)
 
             tfile.file.truncate(0)
@@ -52,7 +54,6 @@ if __name__ == '__main__':
             check_call(('povray +W640 +H480 +I%s +O%s.png' % (tfile.name, resultfn)).split(' '))
             print('%s => %s.png' % (infn, resultfn))
 
-# Kawasaki & Tanaka
                 # q6b = row[10]
                 # if 0.27 < q6b < 0.4:
                 #     tmp.write(sphere(row[0], row[1], row[2], 1, 0, 0).encode())
