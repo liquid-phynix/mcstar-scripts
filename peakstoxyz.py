@@ -16,7 +16,7 @@ if __name__ == '__main__':
         s.write('%d\ncomment\n' % len(d))
         for row in d:
             s.write('A\t%f\t%f\t%f\n' % tuple(row))
-        with open(os.basename(fn).split('.')[0] + '.xyz', 'w') as outf:
+        with open(basename(fn).split('.')[0] + '.xyz', 'w') as outf:
             outf.write(s.getvalue())
 
 #if __name__ == '__main__':
