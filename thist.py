@@ -3,7 +3,11 @@ import tempfile
 import sys
 from os import getcwd, path
 from os.path import basename
-from numpy import loadtxt, zeros
+from numpy import loadtxt, zeros, array
+import matplotlib
+matplotlib.use('Qt4Agg')
+matplotlib.interactive(True)
+from matplotlib.pyplot import *
 
 # kinds of atoms
 AMOR = 1
@@ -14,7 +18,7 @@ CRYS = 3
 def coloring_1(asc, d):
     q6b = d[:,asc['q6b']]
     ret=zeros(len(d))
-    ret[0.27 < q6b < 0.4] = MRCO
+    ret[(0.27 < q6b) * (q6b < 0.4)] = MRCO
     ret[0.4 <= q6b] = CRYS
     return ret
 
@@ -24,8 +28,8 @@ def coloring_2(asc, d):
     q6b = d[:,asc['q6b']]
     ret=zeros(len(d))
     ret[:] = AMOR
-    ret[xi < 7 and q6b >= 0.27] = MRCO
-    ret[xi >= 7 and q6b >= 0.27] = CRYS
+    ret[(xi < 7) * (q6b >= 0.27)] = MRCO
+    ret[(xi >= 7) * (q6b >= 0.27)] = CRYS
     return ret
 
 # Tanaka
@@ -33,7 +37,7 @@ def coloring_3(asc, d):
     q6b = d[:,asc['q6b']]
     ret=zeros(len(d))
     ret[q6b <= 0.28] = AMOR
-    ret[0.28 < q6b < 0.4] = MRCO
+    ret[(0.28 < q6b)  * (q6b < 0.4)] = MRCO
     ret[0.4 <= q6b] = CRYS
     return ret
 
@@ -44,7 +48,7 @@ def coloring_4(asc, d):
     q6b = d[:,asc['q6b']]
     ret=zeros(len(d))
     ret[:] = AMOR
-    ret[(0.02 < q4 < 0.07) and (0.48 < q6 < 0.52)] = MRCO
+    ret[((0.02 < q4) * (q4 < 0.07)) * ((0.48 < q6) * (q6 < 0.52))] = MRCO
     return ret
 
 def name2col(f):
@@ -53,9 +57,9 @@ def name2col(f):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print('usage: %s <bond order files...>')
+        print('usage: %s <bond order files...>' % sys.argv[0])
         sys.exit(1)
-    coloring = coloring_3
+    coloring = coloring_2
     print('using %s for criteria' % coloring.__name__)
     timeseries = []
     for infn in sys.argv[1:]:
@@ -68,9 +72,10 @@ if __name__ == '__main__':
         timeseries.append((num, sum(sep==AMOR), sum(sep==MRCO), sum(sep==CRYS)))
     ts = array(timeseries)
     t,amor,mrco,crys = ts[:,0], ts[:,1], ts[:,2], ts[:,3]
-    plot(t, amor)
-    plot(t, mrco)
-    plot(t, crys)
+    plot(t, amor, '-o', label='amor')
+    plot(t, mrco + amor, '-o', label='mrco')
+    plot(t, crys + mrco + amor, '-o', label='crys')
+    legend()
     draw()
 
 

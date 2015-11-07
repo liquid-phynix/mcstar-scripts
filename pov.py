@@ -63,7 +63,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print('usage: %s <bond order files...>')
         sys.exit(1)
-    coloring = coloring_3
+    coloring = coloring_2
     print('using %s for criteria' % coloring.__name__)
     with tempfile.NamedTemporaryFile() as tfile:
         for infn in sys.argv[1:]:
