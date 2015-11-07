@@ -68,7 +68,7 @@ if __name__ == '__main__':
         with open(infn, 'r') as inf:
             assoc = name2col(inf)
             data=loadtxt(inf)
-        sep = coloring_3(assoc, data)
+        sep = coloring(assoc, data)
         timeseries.append((num, sum(sep==AMOR), sum(sep==MRCO), sum(sep==CRYS)))
     ts = array(timeseries)
     t,amor,mrco,crys = ts[:,0], ts[:,1], ts[:,2], ts[:,3]
