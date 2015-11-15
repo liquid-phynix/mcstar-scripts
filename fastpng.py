@@ -13,9 +13,10 @@ def sort_files(g):
     lst.sort(key = lambda tpl: tpl[0])
     return [(i,fn) for (i,(_,fn)) in enumerate(lst)]
 
-def init(d, fl, min, max):
-    global tdir, fmtlen, dmin, dmax
-    tdir, fmtlen, dmin, dmax = d, fl, min, max
+def init(d, fl, _rmin, _rmax, _cmin, _cmax, _fmin, _fmax):
+    global tdir, fmtlen, rmin, rmax, cmin, cmax, fmin, fmax
+    tdir, fmtlen, fmin, fmax = d, fl, _fmin, _fmax
+    rmin, rmax, cmin, cmax = _rmin, _rmax, _cmin, _cmax
     import png
 
 def worker(tpl):
@@ -23,20 +24,20 @@ def worker(tpl):
     data = load(fn)
     if len(data.shape) == 3:
         data = data[0,:,:]
-    data = (data - dmin) / (dmax - dmin)
+    data = (data - fmin) / (fmax - fmin)
+    if (rmin != None) and (rmax != None) and (cmin != None) and (cmax != None):
+        data = data[rmin:rmax, cmin:cmax]
     shape = data.shape
     data = cmap(data, bytes=True)[:,:,:3].reshape((shape[0], shape[1] * 3))
     png.from_array(data, 'RGB;8').save(('%s/out_%0'+str(fmtlen)+'d.png') % (tdir,it))
 
-def main(here):
-    if here: del sys.argv[0]
-    min, max = float(sys.argv[0]), float(sys.argv[1])
+def main(here, rmin, rmax, cmin, cmax, fmin, fmax):
     files = sort_files(filter_npy(sys.argv[2:]))
     if not files: return
     data = load(files[-1][1])
     if len(data.shape) == 3:
         data = data[0,:,:]
-    height, width = data.shape
+    #height, width = data.shape
     #min, max = data.min(), data.max()
     #min, max = -0.35, 0.35
     del data
@@ -44,10 +45,13 @@ def main(here):
 
     with tempfile.TemporaryDirectory(dir = os.getcwd() if here else None) as tmpdir:
         pool = mp.Pool(processes = mp.cpu_count(), initializer=init,
-                       initargs=(tmpdir, ceil(log10(len(files))), min, max))
+                       initargs=(tmpdir, ceil(log10(len(files))), rmin, rmax, cmin, cmax, fmin, fmax))
         pool.map(worker, files)
         print('images generated')
         os.system('mencoder "mf://%s/out*.png" -o seq.mp4 -of lavf -lavfopts format=mp4 -ss 0 -ovc x264 -x264encopts bframes=1:crf=20.0:nocabac:level_idc=30:global_header:threads=4 -fps 25' % tmpdir)
+        if here:
+            os.system('mkdir images')
+            os.system('mv %s/*.png images/' % tmpdir)
         print('movie saved')
 
 if __name__ == '__main__':
@@ -56,8 +60,24 @@ if __name__ == '__main__':
     from matplotlib.cm import hot, RdYlBu, RdYlGn, gnuplot, gnuplot2, jet
     cmap = gnuplot
     from numpy import load, ceil, log10
-    del sys.argv[0]
-    main(sys.argv[0] == '-h')
+    rmin,rmax,cmin,cmax,fmin,fmax = None,None,None,None,None,None
+    args = sys.argv[1:]
+    here = False
+    if args[0] == '-h':
+        here = True
+        del args[0]
+    if args[0] == '-range':
+        rmin = int(args[1])
+        rmax = int(args[2])
+        cmin = int(args[3])
+        cmax = int(args[4])
+        fmin = float(args[5])
+        fmax = float(args[6])
+    else:
+        fmin = float(args[0])
+        fmax = float(args[1])
+    main(here, rmin, rmax, cmin, cmax, fmin, fmax)
+    #main(sys.argv[0] == '-h')
 
 	# pool = multiprocessing.Pool(processes=4)
 	# results = []
