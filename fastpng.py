@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 def filter_npy(files):
     numbered_npy = re.compile(r'\S+?([0-9]+)\.npy$')
@@ -48,7 +48,7 @@ def main(here, rmin, rmax, cmin, cmax, fmin, fmax):
                        initargs=(tmpdir, ceil(log10(len(files))), rmin, rmax, cmin, cmax, fmin, fmax))
         pool.map(worker, files)
         print('images generated')
-        os.system('mencoder "mf://%s/out*.png" -o seq.mp4 -of lavf -lavfopts format=mp4 -ss 0 -ovc x264 -x264encopts bframes=1:crf=20.0:nocabac:level_idc=30:global_header:threads=4 -fps 25' % tmpdir)
+        os.system('mencoder "mf://%s/out*.png" -o seq.mp4 -of lavf -lavfopts format=mp4 -ss 0 -ovc x264 -x264encopts bframes=1:crf=20.0:nocabac:level_idc=30:global_header:threads=4 -fps 25 > /dev/null' % tmpdir)
         if here:
             os.system('mkdir images')
             os.system('mv %s/*.png images/' % tmpdir)
@@ -62,6 +62,7 @@ if __name__ == '__main__':
     from numpy import load, ceil, log10
     rmin,rmax,cmin,cmax,fmin,fmax = None,None,None,None,None,None
     args = sys.argv[1:]
+    #print('args: %s' % args)
     here = False
     if args[0] == '-h':
         here = True
@@ -76,6 +77,7 @@ if __name__ == '__main__':
     else:
         fmin = float(args[0])
         fmax = float(args[1])
+    #print('here is %s' % here)
     main(here, rmin, rmax, cmin, cmax, fmin, fmax)
     #main(sys.argv[0] == '-h')
 
