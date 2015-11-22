@@ -42,12 +42,13 @@ def plot_all(num, d='./'):
     except IOError: pass
     try:
         peaks = loadtxt(fn_peaks, usecols=(0,1,3))
-        vals = peaks[:,2]
-        peaks[:,2] = 7 * (vals - vals.min())/(vals.max() - vals.min())
-        #if len(peaks)>0: ax.plot(peaks[:,0]/h0, peaks[:,1]/h1,'wo')
-        #val =         #if len(val)>0: ax.scatter(i0/h0, i1/h1, c='black', s=val, edgecolors='none')
-        ps = [patches.Circle((i0/h0,i1/h1), v) for i0,i1,v in peaks]
-        ax.add_collection(PatchCollection(ps, edgecolor='none', facecolor='black'))
+        if len(peaks) > 0:
+            vals = peaks[:,2]
+            peaks[:,2] = 7 * (vals - vals.min())/(vals.max() - vals.min())
+            #if len(peaks)>0: ax.plot(peaks[:,0]/h0, peaks[:,1]/h1,'wo')
+            #val =         #if len(val)>0: ax.scatter(i0/h0, i1/h1, c='black', s=val, edgecolors='none')
+            ps = [patches.Circle((i0/h0,i1/h1), v) for i0,i1,v in peaks]
+            ax.add_collection(PatchCollection(ps, edgecolor='none', facecolor='black'))
     except IOError: pass
     try:
         for iface in (loadtxt(fn_iface) for fn_iface in fn_ifaces):
@@ -89,6 +90,7 @@ from tinydb import TinyDB, Query
 def process_dirs(ds):
     db = TinyDB('./results.json')
     for d in ds:
+        d=d.strip('/')
         print(d)
         misfit = grep(d + '/log', 'misfit')[0].split('=')[-1].strip()
         layers = grep(d + '/log', 'layers')[0].split('=')[-1].strip()
@@ -101,14 +103,15 @@ def process_dirs(ds):
         db.insert(key)
     return db
 
-def print_db(db, **args):
-    rec = Query()
-    query = rec
-    for res in db.search((rec.stress==-1) & (rec.nn==20)):
-            print '{layers},'.format(**res)
-    pass
+#def print_db(db, **args):
+    #rec = Query()
+    #query = rec
+    #for res in db.search((rec.stress==-1) & (rec.nn==20)):
+            #print '{layers},'.format(**res)
+    #pass
 
 def pretty_1(tdb, stress=None, nn=None):
+    rec=Query()
     print '{ %d, ' % nn,
     for res in tdb.search((rec.stress==stress) & (rec.nn==nn)):
         print '{layers},'.format(**res),
