@@ -55,3 +55,79 @@ def plot_all(num, d='./'):
     except IOError: pass
     fig.tight_layout()
 
+def grep(fn, what):
+    def _g():
+        with open(fn, 'r') as f:
+            for line in f.readlines():
+                if line.find(what) != -1:
+                    yield line
+    return list(_g())
+
+#from collections import defaultdict
+#def process_dirs(ds):
+    #res = defaultdict(defaultdict(dict))
+    #res = {}
+    #for d in ds:
+        #print(d)
+        #misfit = grep(d + '/log', 'misfit')[0].split('=')[-1].strip()
+        #layers = grep(d + '/log', 'layers')[0].split('=')[-1].strip()
+        #head = res
+        #for kv in d.split('_'):
+            #k,v=kv.split('=')
+            #key = (k,int(v))
+            #if key not in head:
+                #head[key] = {}
+            #head = head[key]
+        #head.update(misfit=misfit, layers=layers)
+    #return res
+
+#def query(d, ):
+    #pass
+
+from tinydb import TinyDB, Query
+
+def process_dirs(ds):
+    db = TinyDB('./results.json')
+    for d in ds:
+        print(d)
+        misfit = grep(d + '/log', 'misfit')[0].split('=')[-1].strip()
+        layers = grep(d + '/log', 'layers')[0].split('=')[-1].strip()
+        key = {}
+        for kv in d.split('_'):
+            k,v=kv.split('=')
+            key[k] = int(v)
+        key['misfit'] = misfit
+        key['layers'] = layers
+        db.insert(key)
+    return db
+
+def print_db(db, **args):
+    rec = Query()
+    query = rec
+    for res in db.search((rec.stress==-1) & (rec.nn==20)):
+            print '{layers},'.format(**res)
+    pass
+
+def pretty_1(tdb, stress=None, nn=None):
+    print '{ %d, ' % nn,
+    for res in tdb.search((rec.stress==stress) & (rec.nn==nn)):
+        print '{layers},'.format(**res),
+    print '}'
+
+#import dataset
+
+#def process_dirs(ds):
+    #db = dataset.connect('sqlite:///results.db')
+    #table = db['results']
+    #for d in ds:
+        #print(d)
+        #misfit = grep(d + '/log', 'misfit')[0].split('=')[-1].strip()
+        #layers = grep(d + '/log', 'layers')[0].split('=')[-1].strip()
+        #key = {}
+        #for kv in d.split('_'):
+            #k,v=kv.split('=')
+            #key[k] = int(v)
+        #key['misfit'] = misfit
+        #key['layers'] = layers
+        #table.insert(key)
+    #return db
