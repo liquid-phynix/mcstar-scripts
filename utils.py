@@ -92,8 +92,11 @@ def process_dirs(ds):
     for d in ds:
         d=d.strip('/')
         print(d)
-        misfit = grep(d + '/log', 'misfit')[0].split('=')[-1].strip()
-        layers = grep(d + '/log', 'layers')[0].split('=')[-1].strip()
+        misfit = grep(d + '/log', 'misfit')[0]
+        layers = grep(d + '/log', 'layers')[0]
+        if len(misfit)==0 or len(layers)==0: continue
+        misfit = misfit.split('=')[-1].strip()
+        layers = layers..split('=')[-1].strip()
         key = {}
         for kv in d.split('_'):
             k,v=kv.split('=')
