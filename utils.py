@@ -26,6 +26,7 @@ def read_lowpass(fn):
 
 
 def plot_all(num, d='./'):
+    if d[-1] != '/': d = d + '/'
     fn_avg = d + 'avg_%d.lowpass' % num
     fn_amp = d + 'amp_%d.lowpass' % num
     fn_peaks = d + 'peaks_%d.txt' % num
@@ -35,11 +36,13 @@ def plot_all(num, d='./'):
     try:
         #avg,header = read_lowpass(fn_amp)
         avg,header = read_lowpass(fn_avg)
+        imshow(avg)
         h0 = header['l0']/float(header['n0'])
         h1 = header['l1']/float(header['n1'])
         axi=ax.imshow(avg,cmap=cm.gnuplot)
         fig.colorbar(axi)
-    except IOError: pass
+    except None: pass
+    #except IOError: pass
     try:
         peaks = loadtxt(fn_peaks, usecols=(0,1,3))
         if len(peaks) > 0:
@@ -49,11 +52,13 @@ def plot_all(num, d='./'):
             #val =         #if len(val)>0: ax.scatter(i0/h0, i1/h1, c='black', s=val, edgecolors='none')
             ps = [patches.Circle((i0/h0,i1/h1), v) for i0,i1,v in peaks]
             ax.add_collection(PatchCollection(ps, edgecolor='none', facecolor='black'))
-    except IOError: pass
+    except None: pass
+    #except IOError: pass
     try:
         for iface in (loadtxt(fn_iface) for fn_iface in fn_ifaces):
             if len(iface)>0: ax.plot(iface[:,0]/h0, iface[:,1]/h1,'w-')
-    except IOError: pass
+    except None: pass
+    #except IOError: pass
     fig.tight_layout()
 
 def grep(fn, what):
