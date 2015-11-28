@@ -2,6 +2,7 @@ import pickle
 from numpy import loadtxt, fft
 import gzip
 import glob
+from os.path import basename
 from matplotlib import patches
 from matplotlib.collections import PatchCollection
 
@@ -103,7 +104,7 @@ def process_dirs(ds):
         misfit = misfit[0].split('=')[-1].strip()
         layers = layers[0].split('=')[-1].strip()
         key = {}
-        for kv in d.split('_'):
+        for kv in basename(d).split('_'):
             k,v=kv.split('=')
             key[k] = int(v)
         key['misfit'] = misfit
@@ -142,3 +143,25 @@ def pretty_1(tdb, stress=None, nn=None):
         #key['layers'] = layers
         #table.insert(key)
     #return db
+def nn2misfit(stress, nn): return float(nn)/float(nn-stress)-1
+
+def plot_hc_vs_f(db, op=np.min, fig=None, label=None):
+    r=Query()
+    nnlist = set(int(db.get(eid=i)['nn']) for i in range(1, len(db)+1))
+    nnlist = sorted(list(nnlist))
+    #print nnlist
+    conv = {}
+    for stress in [-1,1]:
+        conv[stress] = [array([float(rec['layers']) for rec in db.search((r.stress==stress) & (r.nn==nn))]) for nn in nnlist]
+    if fig is None:
+        fig=figure()
+        if len(fig.get_axes()) == 0:
+            fig.add_subplot(111)
+    ax = fig.get_axes()[0]
+    for s,lst in conv.iteritems():
+        toplot=array([(nn2misfit(s, nn), op(arr)) for nn,arr in zip(nnlist, lst)])
+        ax.plot(toplot[:,0], toplot[:,1],'-x',label=label)
+    draw()
+    return fig
+
+
