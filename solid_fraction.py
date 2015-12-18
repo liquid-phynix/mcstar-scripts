@@ -21,6 +21,7 @@ if __name__ == '__main__':
     hpkernel = 1.-lpkernel
     for fn in sys.argv[1:]:
         data = array(read_csv(fn, sep = ' ', header = None, usecols = (2, )))
+        data = data.reshape(shape)
         data = apply_kernel(data, hpkernel)
         data[:] **= 2
         data = apply_kernel(data, lpkernel)
