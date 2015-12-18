@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from numpy import array, fft
+from numpy import array, fft, ones, real
 from scipy.ndimage import fourier_gaussian
 from pandas import read_csv
 
