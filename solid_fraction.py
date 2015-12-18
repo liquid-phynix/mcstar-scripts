@@ -25,7 +25,8 @@ if __name__ == '__main__':
         data = apply_kernel(data, hpkernel)
         data[:] **= 2
         data = apply_kernel(data, lpkernel)
-        data[:] /= data.max()
+        #print('max=%f' % data.max())
+        data[:] /= 15.7
         data = data >= 0.5
         solid_fr = data.sum() / prod(shape)
         time = int(fn.split('_')[1].split('.')[0])
